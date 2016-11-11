@@ -12,6 +12,7 @@
 import Readout
 import time
 import numpy as np
+from ProgressBar import printProgress
 
 # =========
 # Presets
@@ -50,6 +51,7 @@ multimeter = Readout.Readout()
 
 # Read for the duration set
 read = multimeter.read_loop(duration)
+#read = np.random.rand(10)
 
 # ============
 # Write Data
@@ -57,10 +59,16 @@ read = multimeter.read_loop(duration)
 
 title = path + date + extension
 
+printProgress(0, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+
 # Create header for the file with all the information
 # The header has 8 lines all satrting with #
 header = "{0}\nDuration: {7}\nPointing Position of the Horn: {1}\nAngle pointing: {2}\nCalibrator used: " \
          "{3}\nTemperature Outside: {4}\nTemperature of the calibrator: {5}\nWeather: {6}".format(
             title, looking, angle, calibrator, temperatureOutside, temperatureCalibrator, weather, duration)
 
+printProgress(7, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+
 np.savetxt(title, read, header=header)
+
+printProgress(10, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
