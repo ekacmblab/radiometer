@@ -17,30 +17,25 @@ import time
 import visa
 
 
-class Readout:
+class Readout():
     """This class creates a connection with the multimeter and has methods to read data form it
 
     """
 
     def __init__(self):
-        rm = visa.ResourceManager()
-        self.multimeter = rm.open_resource('USB0::0x0957::0x0618::MY52210065::INSTR')
+        self.rm = visa.ResourceManager()
+        self.multimeter = self.rm.open_resource('USB0::0x0957::0x0618::MY52210065::INSTR')
         # configure multimeter
         self.multimeter.write("CONF:VOLT:DC:RANG 1")
         return
+
+    def close(self):
+        self.rm.close()
 
     def trigger(self, trigger_mode):
         # trigger multimeter with specific mode
         self.multimeter.write("TRIG:SOUR " + trigger_mode)
         return
-
-    def read(self):
-        """ reads form multimeter and returns the data read
-        -**return** and **return types**
-            :return: returns the read data
-        """
-        # read from multimeter (automatically switches mode to "IMM")
-        return self.multimeter.query_ascii_values("READ?")[0]
 
     def read_loop(self, duration):
         """Reads form multimeter for a given duration and returns an array with the time and value read for all readings
@@ -62,3 +57,11 @@ class Readout:
         self.trigger("BUS")
         combined_data = np.column_stack((t, data))
         return combined_data
+
+    def read(self):
+        """ reads form multimeter and returns the data read
+        -**return** and **return types**
+            :return: returns the read data
+        """
+        # read from multimeter (automatically switches mode to "IMM")
+        return self.multimeter.query_ascii_values("READ?")[0]

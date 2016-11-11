@@ -18,7 +18,7 @@ import numpy as np
 # =========
 
 # Duration of the read
-duration = 5*60
+duration = 1*60
 
 # Set the path and name for the file where the data will be wirtten
 # the file name will be of the form: path+"%Y-%m-%d_%H:%M:%S"+extension
@@ -30,14 +30,16 @@ extension = "_Readout.txt"
 # Set heading information
 date = time.strftime("%Y-%m-%d_%H:%M:%S")
 # where the horn was pointing
-looking = "East window Pupin 605"
-# angle of the horn
-angle = "80"
+looking = "Calibration Paddle"
+# angle of the horn form the horizontal perp to support axis
+angle_perp = "90"
+# angle of the horn form the horizontal along the support axis
+angle_par = "90"
 # temperatures
-temperatureOutside = ""
-temperatureCalibrator = ""
-weather = "clear"
-duration = str(duration)
+temperatureOutside = "14"
+temperatureCalibrator = "room temp"
+weather = "very clear. windy"
+duration_str = str(duration)
 # was the calibrator in front
 calibrator = "Yes"
 
@@ -49,7 +51,7 @@ calibrator = "Yes"
 multimeter = Readout.Readout()
 
 # Read for the duration set
-read = multimeter.read_loop(duration)
+data = multimeter.read_loop(duration)
 
 # ============
 # Write Data
@@ -59,8 +61,14 @@ title = path + date + extension
 
 # Create header for the file with all the information
 # The header has 8 lines all satrting with #
-header = "{0}\nDuration: {7}\nPointing Position of the Horn: {1}\nAngle pointing: {2}\nCalibrator used: " \
-         "{3}\nTemperature Outside: {4}\nTemperature of the calibrator: {5}\nWeather: {6}".format(
-            title, looking, angle, calibrator, temperatureOutside, temperatureCalibrator, weather, duration)
+header = "{0}\nDuration (in s): {7}" \
+         "\nPointing Position of the Horn: {1}" \
+         "\nAngle pointing (from horizontal perpendicular to supporting axis): {2}" \
+         "\nAngle pointing (from horizontal parallel to supporting axis): {8}" \
+         "\nCalibrator used: {3}" \
+         "\nTemperature Outside (in celcius): {4}" \
+         "\nTemperature of the calibrator (in celcius): {5}" \
+         "\nWeather: {6}".format(
+            title, looking, angle_perp, calibrator, temperatureOutside, temperatureCalibrator, weather, duration_str, angle_par)
 
-np.savetxt(title, read, header=header)
+np.savetxt(title, data, header=header)
