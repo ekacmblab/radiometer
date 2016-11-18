@@ -12,6 +12,7 @@
 import Readout
 import time
 import numpy as np
+import os
 from ProgressBar import printProgress
 
 # =========
@@ -28,22 +29,28 @@ duration = 1*60
 path = "./Data/"
 extension = "_Readout.txt"
 
+calibrator_boolean = 0
+if calibrator_boolean:
+    # where the horn was pointing
+    looking = "Calibrator paddle"
+    # was the calibrator in front
+    calibrator = "YES"
+else:
+    looking = "Sky"
+    calibrator = "NO"
+
 # Set heading information
 date = time.strftime("%Y-%m-%d_%H:%M:%S")
-# where the horn was pointing
-looking = "Calibration Paddle"
 # angle of the horn form the horizontal perp to support axis
 angle_perp = "90"
 # angle of the horn form the horizontal along the support axis
-angle_par = "90"
+angle_par = "50"
 # temperatures
-temperatureOutside = "14"
-temperatureCalibrator = "room temp"
-weather = "very clear. windy"
+temperatureOutside = "14.0"
+temperatureCalibrator = ""
+weather = "very clear"
 duration_str = str(duration)
-# was the calibrator in front
-calibrator = "Yes"
-
+#
 # ===========
 # Read Data
 # ===========
@@ -51,17 +58,18 @@ calibrator = "Yes"
 # Create a new multimeter of the class Readout to read data
 multimeter = Readout.Readout()
 
+# printProgress(0, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+
 # Read for the duration set
 data = multimeter.read_loop(duration)
 #read = np.random.rand(10)
 
+# printProgress(7, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
 # ============
 # Write Data
 # ============
 
 title = path + date + extension
-
-printProgress(0, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
 
 # Create header for the file with all the information
 # The header has 8 lines all satrting with #
@@ -75,6 +83,6 @@ header = "{0}\nDuration (in s): {7}" \
          "\nWeather: {6}".format(
             title, looking, angle_perp, calibrator, temperatureOutside, temperatureCalibrator, weather, duration_str, angle_par)
 
-
 np.savetxt(title, data, header=header)
-printProgress(7, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+# printProgress(10, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+print('\a')

@@ -52,11 +52,12 @@ class Readout():
         t = []
         t1 = time.time()            # start time
         i =0
-        printProgress(i, duration/10 , prefix='Progress reading data:', suffix='Complete', barLength=50)
+        # print(duration/10)
+        printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
         while time.time() - t1 <= duration:
-            if (time.time()-t1)%10 == 0:
+            if (int(time.time())-int(t1))%10 == 0:
                i += 1
-               printProgress(i, duration / 10, prefix='Progress reading data:', suffix='Complete', barLength=50)
+        #       printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
             t.append(time.time())
             data.append(self.read())
         # when reading ends set trigger to "BUS"
