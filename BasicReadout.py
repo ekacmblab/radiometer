@@ -12,6 +12,7 @@
 import Readout
 import time
 import numpy as np
+import os
 from ProgressBar import printProgress
 
 # =========
@@ -19,7 +20,7 @@ from ProgressBar import printProgress
 # =========
 
 # Duration of the read
-duration = 5*60
+duration = 1*60
 
 # Set the path and name for the file where the data will be wirtten
 # the file name will be of the form: path+"%Y-%m-%d_%H:%M:%S"+extension
@@ -28,20 +29,28 @@ duration = 5*60
 path = "./Data/"
 extension = "_Readout.txt"
 
+calibrator_boolean = 0
+if calibrator_boolean:
+    # where the horn was pointing
+    looking = "Calibrator paddle"
+    # was the calibrator in front
+    calibrator = "YES"
+else:
+    looking = "Sky"
+    calibrator = "NO"
+
 # Set heading information
 date = time.strftime("%Y-%m-%d_%H:%M:%S")
-# where the horn was pointing
-looking = "East window Pupin 605"
-# angle of the horn
-angle = "80"
+# angle of the horn form the horizontal perp to support axis
+angle_perp = "90"
+# angle of the horn form the horizontal along the support axis
+angle_par = "50"
 # temperatures
-temperatureOutside = ""
+temperatureOutside = "14.0"
 temperatureCalibrator = ""
-weather = "clear"
-duration = str(duration)
-# was the calibrator in front
-calibrator = "Yes"
-
+weather = "very clear"
+duration_str = str(duration)
+#
 # ===========
 # Read Data
 # ===========
@@ -49,26 +58,31 @@ calibrator = "Yes"
 # Create a new multimeter of the class Readout to read data
 multimeter = Readout.Readout()
 
+# printProgress(0, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+
 # Read for the duration set
-read = multimeter.read_loop(duration)
+data = multimeter.read_loop(duration)
 #read = np.random.rand(10)
 
+# printProgress(7, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
 # ============
 # Write Data
 # ============
 
 title = path + date + extension
 
-printProgress(0, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
-
 # Create header for the file with all the information
 # The header has 8 lines all satrting with #
-header = "{0}\nDuration: {7}\nPointing Position of the Horn: {1}\nAngle pointing: {2}\nCalibrator used: " \
-         "{3}\nTemperature Outside: {4}\nTemperature of the calibrator: {5}\nWeather: {6}".format(
-            title, looking, angle, calibrator, temperatureOutside, temperatureCalibrator, weather, duration)
+header = "{0}\nDuration (in s): {7}" \
+         "\nPointing Position of the Horn: {1}" \
+         "\nAngle pointing (from horizontal perpendicular to supporting axis): {2}" \
+         "\nAngle pointing (from horizontal parallel to supporting axis): {8}" \
+         "\nCalibrator used: {3}" \
+         "\nTemperature Outside (in celcius): {4}" \
+         "\nTemperature of the calibrator (in celcius): {5}" \
+         "\nWeather: {6}".format(
+            title, looking, angle_perp, calibrator, temperatureOutside, temperatureCalibrator, weather, duration_str, angle_par)
 
-printProgress(7, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
-
-np.savetxt(title, read, header=header)
-
-printProgress(10, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+np.savetxt(title, data, header=header)
+# printProgress(10, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+print('\a')
