@@ -1,6 +1,6 @@
 # !/usr/bin/env python
 # title           :BasicReadout.py
-# description     :This file reads data fro multimeter and writes to a file in disk
+# description     :This file reads data from multimeter and writes to a file in disk
 # author          :Adriana Perez Rotondo
 # date            :2016/11/11
 # version         :0.1
@@ -29,7 +29,8 @@ duration = 1*60
 path = "./Data/"
 extension = "_Readout.txt"
 
-calibrator_boolean = 0
+# set to 1 if the calibrator paddle is on
+calibrator_boolean = 1
 if calibrator_boolean:
     # where the horn was pointing
     looking = "Calibrator paddle"
@@ -44,10 +45,10 @@ date = time.strftime("%Y-%m-%d_%H:%M:%S")
 # angle of the horn form the horizontal perp to support axis
 angle_perp = "90"
 # angle of the horn form the horizontal along the support axis
-angle_par = "50"
-# temperatures
+angle_par = "20"
+# temperatures in celcius
 temperatureOutside = "14.0"
-temperatureCalibrator = ""
+temperatureCalibrator = "-50"
 weather = "very clear"
 duration_str = str(duration)
 #
