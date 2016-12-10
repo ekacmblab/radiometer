@@ -12,7 +12,7 @@
 import Readout
 import time
 import numpy as np
-import os
+import sys
 from ProgressBar import printProgress
 
 # =========
@@ -29,6 +29,7 @@ duration = 1*60
 path = "./Data/"
 extension = "_Readout.txt"
 
+## Set header information
 # set to 1 if the calibrator paddle is on
 calibrator_boolean = 1
 if calibrator_boolean:
@@ -40,8 +41,6 @@ else:
     looking = "Sky"
     calibrator = "NO"
 
-# Set heading information
-date = time.strftime("%Y-%m-%d_%H:%M:%S")
 # angle of the horn form the horizontal perp to support axis
 angle_perp = "90"
 # angle of the horn form the horizontal along the support axis
@@ -50,28 +49,15 @@ angle_par = "20"
 temperatureOutside = "14.0"
 temperatureCalibrator = "-50"
 weather = "very clear"
+
+# =========================
+# Make Header and File Name
+# =========================
+
+date = time.strftime("%Y-%m-%d_%H:%M:%S")
 duration_str = str(duration)
-#
-# ===========
-# Read Data
-# ===========
-
-# Create a new multimeter of the class Readout to read data
-multimeter = Readout.Readout()
-
-# printProgress(0, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
-
-# Read for the duration set
-data = multimeter.read_loop(duration)
-#read = np.random.rand(10)
-
-# printProgress(7, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
-# ============
-# Write Data
-# ============
 
 title = path + date + extension
-
 # Create header for the file with all the information
 # The header has 8 lines all satrting with #
 header = "{0}\nDuration (in s): {7}" \
@@ -84,6 +70,30 @@ header = "{0}\nDuration (in s): {7}" \
          "\nWeather: {6}".format(
             title, looking, angle_perp, calibrator, temperatureOutside, temperatureCalibrator, weather, duration_str, angle_par)
 
-np.savetxt(title, data, header=header)
-# printProgress(10, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
-print('\a')
+data = []
+# ===========
+# Read Data
+# ===========
+
+# Create a new multimeter of the class Readout to read data
+multimeter = Readout.Readout()
+
+try:
+    # printProgress(0, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+
+    # Read for the duration set
+    data = multimeter.read_loop(duration)
+
+finally:
+    # CTRL-C is pressed while reading or writing the data
+    multimeter.close()
+
+    # ============
+    # Write Data
+    # ============
+    print('Writing data')
+    np.savetxt(title, data, header=header)
+    # printProgress(10, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)
+    print('\a')
+    print('Data written in file {0}'.format(title))
+    sys.exit()
