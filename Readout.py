@@ -50,20 +50,27 @@ class Readout():
         self.trigger("IMM")
         data = []
         t = []
-        t1 = time.time()            # start time
-        i =0
-        # print(duration/10)
-        printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
-        while time.time() - t1 <= duration:
-            if (int(time.time())-int(t1))%10 == 0:
-               i += 1
-        #       printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
-            t.append(time.time())
-            data.append(self.read())
-        # when reading ends set trigger to "BUS"
-        self.trigger("BUS")
-        combined_data = np.column_stack((t, data))
-        return combined_data
+        # catch keyboard interrupt error to always return read data
+        try:
+            t1 = time.time()            # start time
+            i = 0
+            # print(duration/10)
+            printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
+            while time.time() - t1 <= duration:
+                # If the time from the beggining is a multiple of 10....
+                if (int(time.time())-int(t1))%10 == 0:
+                    # print progressBar
+                    i += 1
+                    #printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
+                t.append(time.time())
+                data.append(self.read())
+        except KeyboardInterrupt:
+            print('Keyboard interrupt. Exiting...')
+        finally:
+            # when reading ends set trigger to "BUS"
+            self.trigger("BUS")
+            combined_data = np.column_stack((t, data))
+            return combined_data
 
     def read(self):
         """ reads form multimeter and returns the data read
