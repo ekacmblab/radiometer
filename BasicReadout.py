@@ -32,15 +32,6 @@ extension = "_Readout.txt"
 ## Set header information
 # set to 1 if the calibrator paddle is on
 calibrator_boolean = 1
-if calibrator_boolean:
-    # where the horn was pointing
-    looking = "Calibrator paddle"
-    # was the calibrator in front
-    calibrator = "YES"
-else:
-    looking = "Sky"
-    calibrator = "NO"
-
 # angle of the horn form the horizontal perp to support axis
 angle_perp = "90"
 # angle of the horn form the horizontal along the support axis
@@ -49,10 +40,19 @@ angle_par = "20"
 temperatureOutside = "14.0"
 temperatureCalibrator = "-50"
 weather = "very clear"
+units  = "nanoWatt"
 
 # =========================
 # Make Header and File Name
 # =========================
+if calibrator_boolean:
+    # where the horn was pointing
+    looking = "Calibrator paddle"
+    # was the calibrator in front
+    calibrator = "YES"
+else:
+    looking = "Sky"
+    calibrator = "NO"
 
 date = time.strftime("%Y-%m-%d_%H:%M:%S")
 duration_str = str(duration)
@@ -67,8 +67,10 @@ header = "{0}\nDuration (in s): {7}" \
          "\nCalibrator used: {3}" \
          "\nTemperature Outside (in celcius): {4}" \
          "\nTemperature of the calibrator (in celcius): {5}" \
-         "\nWeather: {6}".format(
-            title, looking, angle_perp, calibrator, temperatureOutside, temperatureCalibrator, weather, duration_str, angle_par)
+         "\nWeather: {6}"\
+         "\nUnits: {9}".format(
+            title, looking, angle_perp, calibrator, temperatureOutside, temperatureCalibrator, weather, duration_str, angle_par, units)
+
 
 data = []
 # ===========
