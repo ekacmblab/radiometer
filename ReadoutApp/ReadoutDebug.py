@@ -15,7 +15,7 @@ and basic functions to read from the multimeter"""
 import numpy as np
 import time
 import visa
-from ProgressBar import printProgress
+# from ProgressBar import printProgress
 import random
 
 
@@ -25,6 +25,7 @@ class Readout():
     """
 
     def __init__(self):
+        # type: () -> object
         print('Created')
 
     def close(self):
@@ -54,6 +55,7 @@ class Readout():
                     # printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
                 t.append(time.time())
                 data.append(self.read())
+                time.sleep(2)
         except KeyboardInterrupt:
             print('Keyboard interrupt. Exiting...')
         finally:
