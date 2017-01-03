@@ -15,12 +15,17 @@ import time
 import numpy as np
 import sys
 
+
 if sys.version_info < (3, 0):
     # Python 2
     import Tkinter as tk
+    import tkMessageBox as ms
+    import ttk
 else:
     # Python 3
     import tkinter as tk
+    from tkinter import messagebox as ms
+    #import tkinter.ttk as ttk
 
 # Set the path and name for the file where the data will be wirtten
 # the file name will be of the form: path+"%Y-%m-%d_%H:%M:%S"+extension
@@ -119,7 +124,9 @@ def record(entries):
     # Create a new multimeter of the class Readout to read data
     # global multimeter
     # multimeter = Rd.Readout()
+    #pb.start(1000)
     print('Reading Data...')
+    #tk.Message(root,text='Reading Data...',width=55).pack(side=tk.LEFT)
     # Read for the duration set
     global data
     data = multimeter.read_loop(duration)
@@ -133,13 +140,15 @@ def writefile():
     # close multimeter
     multimeter.close()
     print('Writing data...')
+    #tk.Message(root, text='Writing Data...',width=55).pack(expand=True, fill=tk.BOTH, side=tk.TOP)
     try:
         np.savetxt(title, data, header=header)
     except IOError:
         print('Path not found')
-        #tk.Message(root,text='Path not found')
+        ms.showerror("Error", "Path not found")
         return
     print('Data written in file {0}'.format(title))
+    #tk.Message(root, text='Data written in file {0}'.format(title),width=55).pack(side=tk.LEFT)
 
 
 if __name__ == '__main__':
@@ -149,6 +158,10 @@ if __name__ == '__main__':
     root.geometry("900x500")
     # make the form
     ents = makeform(root, fields)
+    #frame = ttk.Frame()
+    #frame.pack(expand=True, fill=tk.BOTH, side=tk.TOP)
+    #pb = ttk.Progressbar(frame, mode='indeterminate')
+    #pb.pack(expand=True, fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
     try:
         # record data when Return key is entered
         root.bind('<Return>', (lambda event, e=ents: record(e)))
@@ -160,8 +173,6 @@ if __name__ == '__main__':
         writefile()
         root.quit()
         sys.quit()
-    except IOError:
-        print('Path not found')
     # b2 = tk.Button(root, text='Stop', command=(lambda e=ents:writefile()))
     # b2.pack(side=tk.LEFT, padx=5, pady=5)
     # button to quit
