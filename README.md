@@ -8,6 +8,7 @@ This project contains the files necessary to read data from a multimeter connect
 - **BasicReadout.py** reads data from multimeter for a set amount of time and saves data in a .txt file
 - **BasicReadoutApp.py** Makes user interface to read data from multimeter for a set duration
 - **setup.py** setup file to create OS X application from BasicReadoutApp.py
+- **cmb.icns** icon for OS X app
 
 ## Setup Instructions
 This section describes how to setup the OS X app based on BasicReadoutApp.py. If you don't want to create it you can run directly BasicReadout.py or BasicReadoutApp.py as explained in the Running instructions. 
