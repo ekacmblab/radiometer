@@ -15,7 +15,8 @@ and basic functions to read from the multimeter"""
 import numpy as np
 import time
 import visa
-from ProgressBar import printProgress
+# from ProgressBar import printProgress
+import random
 
 
 class Readout():
@@ -24,19 +25,11 @@ class Readout():
     """
 
     def __init__(self):
-        self.rm = visa.ResourceManager()
-        self.multimeter = self.rm.open_resource('USB0::0x0957::0x0618::MY52210065::INSTR')
-        # configure multimeter
-        self.multimeter.write("CONF:VOLT:DC:RANG 1")
-        return
+        # type: () -> object
+        print('Created')
 
     def close(self):
-        self.rm.close()
-
-    def trigger(self, trigger_mode):
-        # trigger multimeter with specific mode
-        self.multimeter.write("TRIG:SOUR " + trigger_mode)
-        return
+        print('close')
 
     def read_loop(self, duration):
         """Reads form multimeter for a given duration and returns an array with the time and value read for all readings
@@ -47,30 +40,29 @@ class Readout():
                 :return: data read in array with time in seconds since the epoch and value read
         """
         # Trigger "IMM"
-        self.trigger("IMM")
         data = []
         t = []
-        # catch keyboard interrupt error to always return read data
         try:
             t1 = time.time()            # start time
             i = 0
             # print(duration/10)
-            printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
+            # printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
             while time.time() - t1 <= duration:
                 # If the time from the beggining is a multiple of 10....
-                if (int(time.time())-int(t1))%10 == 0:
+                if (int(time.time())-int(t1)) % 10 == 0:
                     # print progressBar
                     i += 1
-                    #printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
+                    # printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
                 t.append(time.time())
                 data.append(self.read())
+                time.sleep(2)
         except KeyboardInterrupt:
             print('Keyboard interrupt. Exiting...')
         finally:
             # when reading ends set trigger to "BUS"
-            self.trigger("BUS")
             combined_data = np.column_stack((t, data))
             return combined_data
+
 
     def read(self):
         """ reads form multimeter and returns the data read
@@ -78,4 +70,4 @@ class Readout():
             :return: returns the read data
         """
         # read from multimeter (automatically switches mode to "IMM")
-        return self.multimeter.query_ascii_values("READ?")[0]
+        return random.random()
