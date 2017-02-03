@@ -9,7 +9,8 @@
 # python_version  :2.7.10
 # ==============================================================================
 
-import ReadoutDebug as Rd
+#import ReadoutDebug as Rd
+import Readout as Rd
 import time
 import numpy as np
 import sys

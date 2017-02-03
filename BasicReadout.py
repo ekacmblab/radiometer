@@ -20,7 +20,7 @@ from ProgressBar import printProgress
 # =========
 
 # Duration of the read in seconds
-duration = 1*60
+duration = 15
 
 # Set the path and name for the file where the data will be wirtten
 # the file name will be of the form: path+"%Y-%m-%d_%H:%M:%S"+extension
