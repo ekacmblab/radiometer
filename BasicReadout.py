@@ -59,18 +59,7 @@ duration_str = str(duration)
 
 title = path + date + extension
 # Create header for the file with all the information
-# The header has 8 lines all satrting with #
-header = "{0}\nDuration (in s): {7}" \
-         "\nPointing Position of the Horn: {1}" \
-         "\nAngle pointing (from horizontal perpendicular to supporting axis): {2}" \
-         "\nAngle pointing (from horizontal parallel to supporting axis): {8}" \
-         "\nCalibrator used: {3}" \
-         "\nTemperature Outside (in celcius): {4}" \
-         "\nTemperature of the calibrator (in celcius): {5}" \
-         "\nWeather: {6}"\
-         "\nUnits: {9}".format(
-            title, looking, angle_perp, calibrator, temperatureOutside, temperatureCalibrator, weather, duration_str, angle_par, units)
-
+# The header has 8 lines all starting with #
 
 data = []
 # ===========

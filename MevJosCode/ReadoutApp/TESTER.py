@@ -16,14 +16,39 @@ from scipy import stats as spy
 import numpy as np
 import sys
 import csv
-from ProgressBar import printProgress
+if sys.version_info < (3, 0):
+    # Python 2
+    import Tkinter as tk
+else:
+    # Python 3
+    import tkinter as tk
+
 
 # =========
 # Presets
 # =========
+defaultVal = ['60', './Data/', '_Readout.txt', '1', '90', '20', '14.0', '-50', 'very clear', 'nanoWatt', '']
+data = []
+title = ''
+multimeter = Readout.Readout()
+header = ''
 
-# Duration of the read in seconds
-duration = 60
+def makeform(r, f):
+    entries = []
+    i = 0
+    for field in f:
+        row = tk.Frame(r)
+        lab = tk.Label(row, width=50, text=field, anchor='w')
+        ent = tk.Entry(row)
+        row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        lab.pack(side=tk.LEFT)
+        ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+        ent.insert(0, defaultVal[i])
+        entries.append(ent)
+        i += 1
+    return entries
+
+
 
 # Set the path and name for the file where the data will be written
 # the file name will be of the form: path+"%Y-%m-%d_%H:%M:%S"+extension
@@ -44,6 +69,14 @@ temperatureOutside = "14.0"
 temperatureCalibrator = "-50"
 weather = "very clear"
 units  = "nanoWatt"
+
+
+
+
+
+
+
+
 
 # =========================
 # Make File Name
@@ -108,3 +141,27 @@ finally:
     print('\a')
     print('Data written in file {0}'.format(title))
     sys.exit()
+
+# ==================
+# Form
+# ==================
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.title('Multimeter Measurments')
+    root.geometry("800x500")
+    ents = makeform(root, fields)
+    try:
+        root.bind('<Return>', (lambda event, e=ents: record(e)))
+        b1 = tk.Button(root, text='Start Measurement', command=(lambda e=ents: record(e)))
+        b1.pack(side=tk.LEFT, padx=5, pady=5)
+    except EOFError:
+        # CTRL-C is pressed while reading or writing the data
+        writefile()
+        root.quit()
+        sys.quit()
+    # b2 = tk.Button(root, text='Stop', command=(lambda e=ents:writefile()))
+    # b2.pack(side=tk.LEFT, padx=5, pady=5)
+    b3 = tk.Button(root, text='Quit', command=root.quit)
+    b3.pack(side=tk.LEFT, padx=5, pady=5)
+    root.mainloop()

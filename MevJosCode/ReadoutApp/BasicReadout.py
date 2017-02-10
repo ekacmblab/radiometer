@@ -12,8 +12,10 @@
 #import ReadoutDebug as Rd
 import Readout as Rd
 import time
+from scipy import stats as spy
 import numpy as np
 import sys
+import csv
 
 if sys.version_info < (3, 0):
     # Python 2
@@ -78,21 +80,6 @@ def makeheader(entries):
 
     global title
     title = entval[1] + date + entval[2]
-    # Create header for the file with all the information
-    # The header has 8 lines all satrting with #
-    global header
-    header = "{0}\nDuration (in s): {7}" \
-             "\nPointing Position of the Horn: {1}" \
-             "\nAngle pointing (from horizontal perpendicular to supporting axis): {2}" \
-             "\nAngle pointing (from horizontal parallel to supporting axis): {8}" \
-             "\nCalibrator used: {3}" \
-             "\nTemperature Outside (in celcius): {4}" \
-             "\nTemperature of the calibrator (in celcius): {5}" \
-             "\nWeather: {6}" \
-             "\nUnits: {9}" \
-             "\nComments: {10}".format(
-        title, looking, entval[4], calibrator, entval[6], entval[7], entval[8], duration_str,
-        entval[5], entval[9], entval[10])
     return duration
 
 
@@ -112,7 +99,27 @@ def writefile():
     global multimeter
     multimeter.close()
     print('Writing data...')
-    np.savetxt(title, data, header=header)
+    np.savetxt(title+'.txt', data)
+    mean_temp = np.mean(data[:, 2])
+    mean_volt = np.mean(data[:, 1])
+    err_temp = spy.sem(data[:, 2])
+    err_volt = spy.sem(data[:, 1])
+    with open('./Data/Data_Sheet.csv', 'a') as csvfile:
+        fieldnames = ['Duration (in s)', 'Pointing Position of the Horn',
+                      'Angle pointing (from horizontal perpendicular to supporting axis)',
+                      'Angle pointing (from horizontal parallel to supporting axis)', 'Calibrator used',
+                      'Temperature Outside (in celcius)', 'Weather', 'Units', 'Mean Temperature', 'Temperature Error',
+                      'Mean Voltage', 'Voltage Error']
+        writer = csv.DictWriter(csvfile, delimiter=',', fieldnames=fieldnames)
+        writer.writeheader()
+        # only necessary the first run
+        writer.writerow({'Duration (in s)': duration_str, 'Pointing Position of the Horn': looking,
+                         'Angle pointing (from horizontal perpendicular to supporting axis)': angle_perp,
+                         'Angle pointing (from horizontal parallel to supporting axis)': angle_par,
+                         'Calibrator used': calibrator, 'Temperature Outside (in celcius)': temperatureOutside,
+                         'Weather': weather, 'Units': units, 'Mean Temperature': mean_temp,
+                         'Temperature Error': err_temp, 'Mean Voltage': mean_volt, 'Voltage Error': err_volt})
+
     print('Data written in file {0}'.format(title))
 
 
