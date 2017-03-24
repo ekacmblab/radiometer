@@ -9,8 +9,7 @@
 # python_version  :2.7.10
 # ==============================================================================
 
-#import ReadoutDebug as Rd
-import Readout as Rd
+import electronics as Rd
 import time
 import numpy as np
 import sys
@@ -28,16 +27,10 @@ else:
 # the extension must be a .txt file
 
 fields = ('Duration in (s)', 'Path', 'Extension', 'Using Calibrator (1 for yes, 0 for No)',
-          'Angle of the horn from horizontal perpendicular to support axis',
-          'Angle of the horn from horizontal parallel to support axis', 'Temperature outside',
-          'Temperature of the Calibrator', 'Weather', 'Units of reading', 'Comments')
+          'Angle of the horn from vertical', 'Weather', 'Units of reading', 'Comments')
 
-defaultVal = ['60', './Data/', '_Readout.txt', '1', '90', '20', '14.0', '-50', 'very clear', 'nanoWatt', '']
-data = []
-title = ''
+defaultVal = ['10', './Data/', '_Readout.txt', '1', '0', 'very clear', 'nanoWatt', '']
 multimeter = Rd.Readout()
-header = ''
-
 
 def makeform(r, f):
     entries = []
@@ -54,16 +47,13 @@ def makeform(r, f):
         i += 1
     return entries
 
-
 def makeheader(entries):
     entval = []
     for entry in entries:
         entval.append(entry.get())
     print(entval)
-
     calibrator_boolean = bool(entval[3])
     duration = int(entval[0])
-
     if calibrator_boolean:
         # where the horn was pointing
         looking = "Calibrator paddle"
@@ -72,48 +62,29 @@ def makeheader(entries):
     else:
         looking = "Sky"
         calibrator = "NO"
-
     date = time.strftime("%Y-%m-%d_%H:%M:%S")
     duration_str = str(duration)
-
-    global title
     title = entval[1] + date + entval[2]
-    # Create header for the file with all the information
-    # The header has 8 lines all satrting with #
-    global header
-    header = "{0}\nDuration (in s): {7}" \
+    header = "{0}\nDuration (in s): {0}" \
              "\nPointing Position of the Horn: {1}" \
-             "\nAngle pointing (from horizontal perpendicular to supporting axis): {2}" \
-             "\nAngle pointing (from horizontal parallel to supporting axis): {8}" \
+             "\nAngle pointing (from vertical): {2}" \
              "\nCalibrator used: {3}" \
-             "\nTemperature Outside (in celcius): {4}" \
-             "\nTemperature of the calibrator (in celcius): {5}" \
-             "\nWeather: {6}" \
-             "\nUnits: {9}" \
-             "\nComments: {10}".format(
-        title, looking, entval[4], calibrator, entval[6], entval[7], entval[8], duration_str,
-        entval[5], entval[9], entval[10])
-    return duration
-
+             "\nWeather: {4}" \
+             "\nUnits: {5}" \
+             "\nComments: {6}".format(duration_str, looking, entval[4], calibrator, entval[5], entval[6], entval[7])
+    return duration, header, title
 
 def record(entries):
-    duration = makeheader(entries)
-    # Create a new multimeter of the class Readout to read data
-    # global multimeter
-    # multimeter = Rd.Readout()
     print('Reading Data...')
-    # Read for the duration set
-    global data
+    duration, header, title = makeheader(entries)
     data = multimeter.read_loop(duration)
-    writefile()
+    writefile(title, data, header)
+    return
 
-
-def writefile():
-    global multimeter
-    multimeter.close()
-    print('Writing data...')
+def writefile(title, data, header):
     np.savetxt(title, data, header=header)
     print('Data written in file {0}'.format(title))
+    return
 
 
 if __name__ == '__main__':
@@ -127,11 +98,10 @@ if __name__ == '__main__':
         b1.pack(side=tk.LEFT, padx=5, pady=5)
     except EOFError:
         # CTRL-C is pressed while reading or writing the data
-        writefile()
+        multimeter.close()
         root.quit()
         sys.quit()
-    # b2 = tk.Button(root, text='Stop', command=(lambda e=ents:writefile()))
-    # b2.pack(side=tk.LEFT, padx=5, pady=5)
     b3 = tk.Button(root, text='Quit', command=root.quit)
     b3.pack(side=tk.LEFT, padx=5, pady=5)
     root.mainloop()
+    multimeter.close()

@@ -14,8 +14,8 @@ and basic functions to read from the multimeter"""
 
 import numpy as np
 import time
+import thermoreadout
 import visa
-from ProgressBar import printProgress
 
 
 class Readout():
@@ -26,12 +26,13 @@ class Readout():
     def __init__(self):
         self.rm = visa.ResourceManager()
         self.multimeter = self.rm.open_resource('USB0::0x0957::0x0618::MY52210065::INSTR')
-        # configure multimeter
         self.multimeter.write("CONF:VOLT:DC:RANG 1")
+        self.thermometer = thermoreadout.Thermometer()
         return
 
     def close(self):
         self.rm.close()
+        self.thermometer.close()
 
     def trigger(self, trigger_mode):
         # trigger multimeter with specific mode
@@ -49,27 +50,20 @@ class Readout():
         # Trigger "IMM"
         self.trigger("IMM")
         data = []
+        data_temp = []
         t = []
-        # catch keyboard interrupt error to always return read data
         try:
             t1 = time.time()            # start time
-            i = 0
-            # print(duration/10)
-            printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
             while time.time() - t1 <= duration:
-                # If the time from the beggining is a multiple of 10....
-                if (int(time.time())-int(t1))%10 == 0:
-                    # print progressBar
-                    i += 1
-                    #printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
                 t.append(time.time())
                 data.append(self.read())
+                data_temp.append(self.thermometer.get_temp())
         except KeyboardInterrupt:
             print('Keyboard interrupt. Exiting...')
         finally:
             # when reading ends set trigger to "BUS"
             self.trigger("BUS")
-            combined_data = np.column_stack((t, data))
+            combined_data = np.column_stack((t, data, data_temp))
             return combined_data
 
     def read(self):
