@@ -100,8 +100,6 @@ data = []
 # Read Data
 # ===========
 
-# Create a new multimeter of the class Readout to read data
-multimeter = Readout.Readout()
 
 try:
     # printProgress(0, 10, prefix='Progress writing data:', suffix='Complete', barLength=50)

@@ -2,9 +2,8 @@
 # title           :Readout.py
 # description     :This file creates a class for a Agilent 34405A 5 1/2 Digit Multimeter
 # author          :Adriana Perez Rotondo
-# editor	   :Mevludin Isic
-# date            :2017/03/02
-# version         :0.1.1
+# date            :2016/11/11
+# version         :0.1
 # usage           :import Readout
 #                  r = Readout.Readout()
 # notes           :
@@ -16,7 +15,6 @@ and basic functions to read from the multimeter"""
 import numpy as np
 import time
 import visa
-import thermoreadout
 from ProgressBar import printProgress
 
 
@@ -28,7 +26,6 @@ class Readout():
     def __init__(self):
         self.rm = visa.ResourceManager()
         self.multimeter = self.rm.open_resource('USB0::0x0957::0x0618::MY52210065::INSTR')
-        self.thermometer = thermoreadout.Thermometer()
         # configure multimeter
         self.multimeter.write("CONF:VOLT:DC:RANG 1")
         return
@@ -51,7 +48,6 @@ class Readout():
         """
         # Trigger "IMM"
         self.trigger("IMM")
-        dataTemp = []
         data = []
         t = []
         # catch keyboard interrupt error to always return read data
@@ -68,14 +64,12 @@ class Readout():
                     #printProgress(i, duration/10, prefix='Progress reading data:', suffix='Complete', barLength=100)
                 t.append(time.time())
                 data.append(self.read())
-                dataTemp.append(self.thermometer.get_temp())
-
         except KeyboardInterrupt:
             print('Keyboard interrupt. Exiting...')
         finally:
             # when reading ends set trigger to "BUS"
             self.trigger("BUS")
-            combined_data = np.column_stack((t, data, dataTemp))
+            combined_data = np.column_stack((t, data))
             return combined_data
 
     def read(self):

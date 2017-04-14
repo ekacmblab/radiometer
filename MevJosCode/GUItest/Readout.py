@@ -17,7 +17,6 @@ import numpy as np
 import time
 import visa
 import thermoreadout
-from ProgressBar import printProgress
 
 
 class Readout():

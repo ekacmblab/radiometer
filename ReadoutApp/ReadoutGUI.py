@@ -65,7 +65,7 @@ def makeheader(entries):
     date = time.strftime("%Y-%m-%d_%H:%M:%S")
     duration_str = str(duration)
     title = entval[1] + date + entval[2]
-    header = "{0}\nDuration (in s): {0}" \
+    header = "\nDuration (in s): {0}" \
              "\nPointing Position of the Horn: {1}" \
              "\nAngle pointing (from vertical): {2}" \
              "\nCalibrator used: {3}" \
@@ -104,4 +104,3 @@ if __name__ == '__main__':
     b3 = tk.Button(root, text='Quit', command=root.quit)
     b3.pack(side=tk.LEFT, padx=5, pady=5)
     root.mainloop()
-    multimeter.close()
